@@ -84,6 +84,8 @@ Bộ test sau khi sinh sẽ nằm trong thư mục `problems/mult2019/tests/`.
 
 *   `npm run polygon status`: Kiểm tra trạng thái đồng bộ của tất cả các bài tập.
 *   `npm run polygon download <slug>`: Chỉ build và tải gói bài tập (.zip) về thư mục `downloads/`.
+*   `npm run polygon contest <name> <slugs...>`: Tạo một gói contest (.zip) chứa nhiều bài tập. ZIP sẽ chứa các file giải (`.cpp`) và thư mục test của từng bài. File zip được lưu trong thư mục `contests/`.
+    *   Ví dụ: `npm run polygon contest prets10c4_26 divsub mult2019 sort`
 
 ## 5. Lưu ý cho người dùng
 *   **An toàn dữ liệu**: Đừng bao giờ commit file `.env` lên GitHub.

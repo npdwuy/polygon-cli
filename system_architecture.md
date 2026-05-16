@@ -21,6 +21,7 @@ Polygon-tool/
         ├── main.cpp           # Lời giải chuẩn (Model Answer - MA)
         ├── statement.tex      # Đề bài định dạng LaTeX (Tiếng Việt mặc định)
         └── tests/             # Dữ liệu test sau khi Extract (In/Out)
+├── contests/                  # Lưu trữ các file ZIP contest đã đóng gói
 ```
 
 ---
@@ -86,6 +87,23 @@ Pipeline được thiết kế để đảm bảo tính nhất quán (Atomicity)
 
 ---
 
+## 4. Contest Packaging (Đóng gói kỳ thi)
+
+Thành phần mới cho phép gộp nhiều bài tập thành một gói duy nhất để triển khai lên các nền tảng khác.
+
+- **Grouping**: Gom các folder `tests/` của từng bài và file `main.cpp` (đổi tên thành `[slug].cpp`).
+- **Structure**:
+  ```text
+  [contest_name].zip
+  ├── slug1.cpp
+  ├── slug1/ (folder chứa test)
+  ├── slug2.cpp
+  └── slug2/
+  ```
+- **Optimization**: Toàn bộ quá trình đóng gói diễn ra trong thư mục tạm và tự động xóa sau khi tạo file ZIP để tối ưu bộ nhớ.
+
+---
+
 ## 4. API Core & Fault Tolerance (Tầng mạng)
 
 - **Signature Security**: Áp dụng thuật toán SHA-512 theo đúng chuẩn Polygon: `rand/method?params#secret`.
@@ -102,6 +120,7 @@ Pipeline được thiết kế để đảm bảo tính nhất quán (Atomicity)
 4.  `polygon download <slug>`: Build và tải ZIP (Bước 5).
 5.  `polygon extract <slug>`: Giải nén và tạo test local (Bước 6).
 6.  `polygon status`: Kiểm tra tổng quan tiến độ của các bài tập.
+7.  `polygon contest <name> <slugs...>`: Đóng gói các bài tập thành file ZIP kỳ thi.
 
 ---
 

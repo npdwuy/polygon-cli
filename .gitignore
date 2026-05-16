@@ -3,6 +3,10 @@ node_modules/
 downloads/
 temp_extract_*/
 scratch/
-problems/*/tests/
+problems/
+contests/
+task.md
+tasks.md
+prompt.md
 package-lock.json
 *.zip

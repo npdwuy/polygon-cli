@@ -67,6 +67,7 @@ export class WorkspaceManager {
 
   async ensureStructure() {
     await fs.ensureDir(path.join(this.rootDir, 'problems'));
+    await fs.ensureDir(path.join(this.rootDir, 'contests'));
     if (!await fs.pathExists(this.problemJsonPath)) {
       await fs.writeJson(this.problemJsonPath, { problems: [] }, { spaces: 2 });
     }

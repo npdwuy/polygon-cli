@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { PolygonAPI } from '../core/polygon';
 import { WorkspaceManager } from '../core/workspace';
 import { SyncPipeline } from '../core/pipeline';
+import { ContestManager } from '../core/contest';
 import path from 'path';
 import fs from 'fs-extra';
 
@@ -171,6 +172,21 @@ program
       })));
     } catch (error: any) {
       console.error('❌ Failed to fetch status:', error.message);
+    }
+  });
+
+program
+  .command('contest')
+  .description('Create a contest package from selected problems')
+  .argument('<name>', 'Contest name (e.g., round-1)')
+  .argument('<slugs...>', 'Problem slugs to include in the contest')
+  .action(async (name, slugs) => {
+    try {
+      await workspace.ensureStructure();
+      const manager = new ContestManager(workspace);
+      await manager.createContest(slugs, name);
+    } catch (error: any) {
+      console.error('❌ Contest creation failed:', error.message);
     }
   });
 
