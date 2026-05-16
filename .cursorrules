@@ -1,0 +1,65 @@
+STRICT RULES:
+
+GENERAL
+* Treat this as a production codebase
+* Preserve existing architecture
+* Make minimal changes only
+* Never rewrite unrelated code
+* Never rename files unless explicitly requested
+* Preserve current folder structure
+* Follow existing coding style and conventions
+* Reuse existing utilities/components whenever possible
+* Do not create duplicate implementations
+* Do not introduce new frameworks or libraries unless explicitly requested
+* Prefer readability over cleverness
+* Avoid overengineering
+* Keep code production-ready
+
+TYPESCRIPT
+* Use strict TypeScript
+* Do not use `any`
+* Do not suppress TypeScript errors
+* Use explicit types for public functions
+* Prefer type safety over shortcuts
+
+NEXT.JS
+* Use App Router only
+* Use Server Actions only unless API routes are explicitly requested
+* Prefer server components when possible
+* Avoid unnecessary client components
+* Avoid unnecessary rerenders
+
+DATABASE
+* Do not modify database schema unless explicitly requested
+* Do not change Prisma models unrelated to the task
+* Do not create unsafe migrations
+* Preserve existing database relations and naming
+
+UI/UX
+* Do not redesign existing UI unless requested
+* Reuse existing UI components
+* Preserve responsiveness and accessibility
+* Keep styling consistent with the current project
+
+PERFORMANCE
+* Avoid unnecessary API calls
+* Avoid unnecessary abstractions
+* Prefer simple and maintainable solutions
+* Optimize for clarity and stability first
+
+DEBUGGING
+* If requirements are ambiguous, ask before implementing
+* Clearly explain risky or breaking changes
+* Do not silently change existing behavior
+* Explain assumptions before major refactors
+
+GIT/CHANGES
+* Modify only files directly related to the task
+* Keep diffs small and focused
+* Do not touch unrelated logic
+* Do not remove existing comments or documentation unless outdated
+
+OUTPUT STYLE
+* Show step-by-step implementation plan before coding major features
+* Explain why important decisions are made
+* Keep responses concise and technical

@@ -1,0 +1,62 @@
+{
+  "problems": [
+    {
+      "local_id": "mult2019",
+      "name": "Multiple of 2019",
+      "paths": {
+        "generator": "problems/mult2019/generator.cpp",
+        "statement": "problems/mult2019/statement.tex",
+        "solutions": [
+          {
+            "path": "problems/mult2019/main.cpp",
+            "tag": "MA"
+          },
+          {
+            "path": "problems/mult2019/brute.cpp",
+            "tag": "TL"
+          },
+          {
+            "path": "problems/mult2019/wrong.cpp",
+            "tag": "WA"
+          }
+        ]
+      },
+      "settings": {
+        "time_limit": 1000,
+        "memory_limit": 1024,
+        "checker": "std::lcmp.cpp",
+        "compiler": "cpp.gcc14-64-msys2-g++23",
+        "auto_distribute_100_points": true
+      },
+      "test_config": {
+        "total_tests": 20,
+        "number_of_samples": 1,
+        "subtasks": [
+          {
+            "id": 1,
+            "percent": 30,
+            "args": "200000"
+          },
+          {
+            "id": 2,
+            "percent": 30,
+            "args": "2000"
+          },
+          {
+            "id": 3,
+            "percent": 40,
+            "args": "200000"
+          }
+        ]
+      },
+      "pipeline_status": {
+        "SETUP": false,
+        "MAIN": false,
+        "GEN": false,
+        "TESTS": false,
+        "BUILD": "NONE"
+      },
+      "polygon_id": 542264
+    }
+  ]
+}
