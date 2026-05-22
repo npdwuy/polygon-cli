@@ -38,10 +38,6 @@ export const ProblemSchema = z.object({
     subtasks: z.array(SubtaskSchema),
   }),
   pipeline_status: z.object({
-    SETUP: z.boolean().default(false),
-    MAIN: z.boolean().default(false),
-    GEN: z.boolean().default(false),
-    TESTS: z.boolean().default(false),
     BUILD: z.enum(['PENDING', 'RUNNING', 'READY', 'FAILED', 'NONE']).default('NONE'),
   }),
 });

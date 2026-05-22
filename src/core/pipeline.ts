@@ -87,10 +87,15 @@ export class SyncPipeline {
       }
     }
 
+    const scriptContent = scriptLines.join('\n');
+    const scriptPath = path.join(path.dirname(problem.paths.generator), 'script.txt');
+    console.log(`Step TESTS: Saving script locally to ${scriptPath}...`);
+    await fs.writeFile(scriptPath, scriptContent, 'utf-8');
+
     await this.api.call('problem.saveScript', {
       ...pId,
       testset: 'tests', // Default testset
-      source: scriptLines.join('\n'),
+      source: scriptContent,
     });
 
     // 5. COMMIT

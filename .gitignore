@@ -10,3 +10,6 @@ tasks.md
 prompt.md
 package-lock.json
 *.zip
+problem.json
+contest.json
+

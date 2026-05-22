@@ -81,10 +81,6 @@ program
           subtasks: [{ id: 1, percent: 100 }],
         },
         pipeline_status: {
-          SETUP: false,
-          MAIN: false,
-          GEN: false,
-          TESTS: false,
           BUILD: 'NONE' as const,
         },
       };
@@ -166,8 +162,6 @@ program
         ID: p.local_id,
         Name: p.name,
         PolygonID: p.polygon_id || 'N/A',
-        SETUP: p.pipeline_status.SETUP ? '✅' : '❌',
-        TESTS: p.pipeline_status.TESTS ? '✅' : '❌',
         BUILD: p.pipeline_status.BUILD,
       })));
     } catch (error: any) {
