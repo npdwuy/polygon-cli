@@ -113,18 +113,18 @@ export class SyncPipeline {
 
     const pId = { problemId: problem.polygon_id };
 
-    console.log('Step BUILD: Triggering package build...');
+    console.log(`[${problemSlug}] Step BUILD: Triggering package build...`);
     try {
         await this.api.call('problem.buildPackage', { ...pId, verify: true, full: true });
     } catch (e: any) {
         if (e.message.includes('already being built') || e.message.includes('already non-failed full package')) {
-            console.log('Package is already built or being built.');
+            console.log(`[${problemSlug}] Package is already built or being built.`);
         } else {
             throw e;
         }
     }
 
-    console.log('Step BUILD: Polling for package readiness...');
+    console.log(`[${problemSlug}] Step BUILD: Polling for package readiness...`);
     let packageId = -1;
     while (true) {
       const packages = await this.api.call<any[]>('problem.packages', pId);
@@ -137,15 +137,15 @@ export class SyncPipeline {
         } else if (latest.state === 'FAILED') {
           throw new Error(`Package build failed: ${latest.comment}`);
         }
-        console.log(`Current state: ${latest.state}. Waiting...`);
+        console.log(`[${problemSlug}] Current state: ${latest.state}. Waiting...`);
       } else {
-          console.log('No packages found. Waiting...');
+          console.log(`[${problemSlug}] No packages found. Waiting...`);
       }
       
       await new Promise(resolve => setTimeout(resolve, 5000));
     }
 
-    console.log(`Step DOWNLOAD: Downloading package ${packageId}...`);
+    console.log(`[${problemSlug}] Step DOWNLOAD: Downloading package ${packageId}...`);
     const buffer = await this.api.download('problem.package', { ...pId, packageId });
     
     const downloadDir = path.join(process.cwd(), 'downloads');
@@ -153,8 +153,43 @@ export class SyncPipeline {
     const filePath = path.join(downloadDir, `${problemSlug}.zip`);
     await fs.writeFile(filePath, buffer);
     
-    console.log(`✅ Package downloaded to: ${filePath}`);
+    console.log(`[${problemSlug}] ✅ Package downloaded to: ${filePath}`);
     await this.workspace.updateProblem(problemSlug, { pipeline_status: { ...problem.pipeline_status, BUILD: 'READY' } });
+  }
+
+  async downloadPackagesParallel(slugs: string[]) {
+    if (slugs.length === 0) {
+      console.log('No slugs provided for parallel download.');
+      return;
+    }
+
+    console.log(`Starting parallel build & download for ${slugs.length} problems: ${slugs.join(', ')}`);
+    const results = await Promise.all(
+      slugs.map(async (slug) => {
+        try {
+          await this.downloadPackage(slug);
+          return { slug, success: true };
+        } catch (error: any) {
+          console.error(`[${slug}] ❌ Failed: ${error.message}`);
+          return { slug, success: false, error: error.message };
+        }
+      })
+    );
+
+    const succeeded = results.filter(r => r.success).map(r => r.slug);
+    const failed = results.filter(r => !r.success);
+
+    console.log(`\n=== Download Summary ===`);
+    console.log(`Succeeded (${succeeded.length}): ${succeeded.join(', ')}`);
+    if (failed.length > 0) {
+      console.log(`Failed (${failed.length}):`);
+      failed.forEach(f => console.log(` - ${f.slug}: ${f.error}`));
+    }
+    console.log(`========================\n`);
+
+    if (failed.length > 0) {
+      throw new Error(`Failed to download packages for: ${failed.map(f => f.slug).join(', ')}`);
+    }
   }
 
   async extractTests(problemSlug: string) {

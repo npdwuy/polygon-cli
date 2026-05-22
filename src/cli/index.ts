@@ -102,48 +102,121 @@ program
 
 
 
+async function resolveSlugs(slugs: string[], options: { all?: boolean }): Promise<string[]> {
+  const problems = await workspace.getProblems();
+  if (options.all) {
+    if (problems.length === 0) {
+      throw new Error('No problems registered in the workspace.');
+    }
+    return problems.map(p => p.local_id);
+  }
+
+  if (!slugs || slugs.length === 0) {
+    throw new Error('Please specify at least one problem slug or use the --all (-a) flag.');
+  }
+
+  const registeredSlugs = new Set(problems.map(p => p.local_id));
+  const invalidSlugs: string[] = [];
+  for (const slug of slugs) {
+    if (!registeredSlugs.has(slug)) {
+      invalidSlugs.push(slug);
+    }
+  }
+
+  if (invalidSlugs.length > 0) {
+    throw new Error(`The following slugs are not registered in problem.json: ${invalidSlugs.join(', ')}`);
+  }
+
+  return slugs;
+}
+
 program
   .command('sync')
-  .description('Sync a problem with Polygon')
-  .argument('<slug>', 'Problem slug to sync')
-  .action(async (slug) => {
+  .description('Sync one or more problems with Polygon')
+  .argument('[slugs...]', 'Problem slugs to sync')
+  .option('-a, --all', 'Sync all registered problems')
+  .action(async (slugs, options) => {
     try {
+      const resolved = await resolveSlugs(slugs, options);
       const api = new PolygonAPI();
       const pipeline = new SyncPipeline(api, workspace);
-      await pipeline.run(slug);
-      console.log(`✅ Sync completed for ${slug}`);
+      
+      console.log(`Syncing ${resolved.length} problems in parallel: ${resolved.join(', ')}`);
+      
+      const results = await Promise.all(
+        resolved.map(async (slug) => {
+          try {
+            await pipeline.run(slug);
+            console.log(`✅ [${slug}] Sync completed`);
+            return { slug, success: true };
+          } catch (error: any) {
+            console.error(`❌ [${slug}] Sync failed:`, error.message);
+            return { slug, success: false, error: error.message };
+          }
+        })
+      );
+      
+      const failed = results.filter(r => !r.success);
+      if (failed.length > 0) {
+        console.error(`❌ Failed to sync some problems: ${failed.map(f => f.slug).join(', ')}`);
+        process.exit(1);
+      } else {
+        console.log('✅ All problems synced successfully.');
+      }
     } catch (error: any) {
-      console.error(`❌ Sync failed for ${slug}:`, error.message);
+      console.error('❌ Sync failed:', error.message);
+      process.exit(1);
     }
   });
 
 program
   .command('download')
-  .description('Build and download the problem package')
-  .argument('<slug>', 'Problem slug to download')
-  .action(async (slug) => {
+  .description('Build and download problem packages')
+  .argument('[slugs...]', 'Problem slugs to download')
+  .option('-a, --all', 'Download all registered problems')
+  .action(async (slugs, options) => {
     try {
+      const resolved = await resolveSlugs(slugs, options);
       const api = new PolygonAPI();
       const pipeline = new SyncPipeline(api, workspace);
-      await pipeline.downloadPackage(slug);
+      await pipeline.downloadPackagesParallel(resolved);
+      console.log('✅ All package downloads completed successfully.');
     } catch (error: any) {
-      console.error(`❌ Download failed for ${slug}:`, error.message);
+      console.error('❌ Download failed:', error.message);
+      process.exit(1);
     }
   });
 
 program
   .command('extract')
-  .description('Download and extract tests from Polygon package')
-  .argument('<slug>', 'Problem slug to extract')
-  .action(async (slug) => {
+  .description('Download and extract tests from Polygon packages')
+  .argument('[slugs...]', 'Problem slugs to extract')
+  .option('-a, --all', 'Extract all registered problems')
+  .action(async (slugs, options) => {
     try {
+      const resolved = await resolveSlugs(slugs, options);
       const api = new PolygonAPI();
       const pipeline = new SyncPipeline(api, workspace);
-      await pipeline.downloadPackage(slug);
-      await pipeline.extractTests(slug);
-      console.log(`✅ All steps completed for ${slug}`);
+      
+      // 1. Download parallel
+      await pipeline.downloadPackagesParallel(resolved);
+      
+      // 2. Extract sequentially
+      console.log(`\nStarting sequential test extraction for: ${resolved.join(', ')}`);
+      for (const slug of resolved) {
+        console.log(`\n--- [${slug}] Starting extraction & local compilation ---`);
+        try {
+          await pipeline.extractTests(slug);
+          console.log(`✅ [${slug}] Extraction and compilation completed`);
+        } catch (error: any) {
+          console.error(`❌ [${slug}] Extraction failed:`, error.message);
+          throw error;
+        }
+      }
+      console.log('\n✅ All steps completed successfully for all problems.');
     } catch (error: any) {
-      console.error(`❌ Extraction failed for ${slug}:`, error.message);
+      console.error('❌ Extraction failed:', error.message);
+      process.exit(1);
     }
   });
 
