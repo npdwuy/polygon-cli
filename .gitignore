@@ -12,4 +12,5 @@ package-lock.json
 *.zip
 problem.json
 contest.json
+todo/
 
