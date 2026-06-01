@@ -1,0 +1,671 @@
+@charset "utf-8";
+
+html {
+    text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, p, blockquote, th, td {
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    margin: 0;
+    padding: 2px;
+}
+
+iframe {
+    border: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+fieldset, img {
+    border: 0;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+    font-style: normal;
+    font-weight: normal;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+caption, th {
+    text-align: left;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-size: 100%;
+    font-weight: normal;
+}
+
+q:before, q:after {
+    content: '';
+}
+
+abbr, acronym {
+    border: 0;
+}
+
+a:link {
+    color: #0000cc;
+}
+
+body {
+    background: #fff;
+    margin: 3px 8px;
+}
+
+body, select, input {
+    font-family: arial, sans-serif;
+}
+
+body {
+    font-size: 83%;
+}
+
+td td, th th, th td, td th {
+    font-size: 100%;
+}
+
+pre {
+    font-size: 110%;
+}
+
+form {
+    padding: 0;
+    margin: 0;
+}
+
+input {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+hr {
+    color: #ccc;
+    background-color: #ccc;
+}
+
+.blue-box {
+    background-color: #e5ecf9;
+    border-color: #c3d9ff !important;
+}
+
+.grey-box {
+    font-size: 11px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 2px 2px 2px 5px;
+    border: 1px solid #909090;
+    background-color: #f0f0f0;
+    color: #555;
+    margin-right: 1em;
+    display: inline-block;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.grey-box.compact {
+    margin: 0;
+    padding: 0 3px;
+    font-size: 9px;
+}
+
+.gray-box {
+    background-color: #f0f0f0;
+    border-color: #909090 !important;
+}
+
+.brown-box {
+    background-color: rgb(248, 233, 161);
+    border-color: rgb(204, 204, 204) !important;
+}
+
+.red-box {
+    background-color: #EF9A9A;
+    border-color: rgb(204, 204, 204) !important;
+}
+
+.color-box {
+    z-index: 2;
+    margin: 1em;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-radius: 6px;
+}
+
+.color-box h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.color-box h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.color-box ul {
+    list-style: disc inside;
+}
+
+.color-box ul li {
+    margin: 0.25em 0;
+}
+
+.t {
+    position: absolute;
+}
+
+.color-box .text {
+    padding: 7px;
+}
+
+.page-name {
+    margin-left: 0.5em;
+    float: left;
+    font-size: 120%;
+}
+
+.menu span {
+    float: right;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 90%;
+}
+
+.welcome-text {
+    padding: 4em;
+}
+
+.welcome-text * {
+    font-size: 16px;
+}
+
+.welcome-text ul {
+    padding: 0.5em;
+    list-style: disc inside;
+}
+
+.valid {
+    border: 2px solid green !important;
+}
+
+.invalid {
+    border: 2px solid #800 !important;
+}
+
+.error {
+    color: red;
+}
+
+.warning {
+    color: orange;
+}
+
+.field-error {
+    color: red;
+    font-size: 75%;
+    position: relative;
+    display: block; /*width: 20em;*/
+    width: 100%;
+    top: -7px;
+}
+
+.field-notice {
+    color: #777;
+    font-size: 11px;
+    position: relative;
+    display: block;
+    width: 100%;
+    top: -7px;
+}
+
+.index-info-box {
+    width: 250px;
+}
+
+.caption {
+    font-size: 16px;
+}
+
+.caption * {
+    display: inline;
+}
+
+.grid {
+    width: calc(100% - 2em);
+    margin: 0.5em 1em 0 1em;
+}
+
+.grid tr {
+}
+
+.grid tr td {
+    font-size: 100%;
+    border: 1px solid #B2B2B2;
+    padding: 0.25em 0.5em;
+}
+
+.grid tr th {
+    font-size: 100%;
+    border: 1px solid #B2B2B2;
+    text-align: center;
+    padding: 0.25em 0.5em;
+    color: rgb(0, 0, 204);
+    background-color: #e5ecf9;
+    font-weight: bold;
+}
+
+.grid tr th.problem-access-holder-column {
+    color: #000;
+    font-weight: normal;
+}
+
+.grid thead td {
+    background-color: #e5ecf9;
+}
+
+.grid:not(.disableTrHoverHighlight) tbody tr:hover:not(:only-child).checked td {
+    background-color: #e5ecf9 !important;
+}
+
+.grid:not(.disableTrHoverHighlight) tbody tr:hover:not(:only-child) td {
+    background-color: #f2f2f2 !important;
+}
+
+table.problem-list-grid .package-status {
+    font-size: 11px !important;
+}
+
+.under, .under * {
+    margin: 0;
+    padding-top: 1px !important;
+    padding-bottom: 0 !important;
+    line-height: 12px;
+    min-height: 12px;
+}
+
+.invalidRow {
+    background-color: #ffe3e3;
+}
+
+.grid caption {
+    font-size: 125%;
+}
+
+.edit-info-box {
+    width: 300px;
+}
+
+.edit-info-box td {
+    padding: 0.25em 0.5em;
+}
+
+.commit-form td {
+    padding: 0.5em;
+}
+
+.around {
+    margin: 1em;
+    border-left: 4px solid #e5ecf9;
+}
+
+.left-form input:not([type='checkbox']) {
+    width: 15em;
+}
+
+.left-form select {
+    width: 15em;
+}
+
+.left-form .first-column {
+    width: 12.5em;
+}
+
+.left-form #fileUpload {
+    width: 20em;
+}
+
+.left-form table {
+    margin: 2em 0 2em 2em;
+}
+
+.left-form td {
+    padding: 0.5em;
+}
+
+.statements {
+    vertical-align: top;
+}
+
+.statements .statements-menu * {
+    font-size: 14px;
+}
+
+.statements a {
+    margin: 0.5em;
+}
+
+.statements #right {
+    float: right;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 110%;
+}
+
+.tests .tests-menu *,
+.invocations .tests-menu * {
+    font-size: 14px;
+}
+
+.tests a,
+.invocations a {
+    margin: 0.5em;
+}
+
+.tests .testsetA,
+.invocations .testsetA,
+.statements .statement-languageA {
+    margin: 0 0.5em 0 0 !important;
+}
+
+.tests a:last-child,
+.invocations a:last-child,
+.statements a:last-child {
+    margin-right: 0 !important;
+}
+
+.tests #right {
+    float: right;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: 110%;
+}
+
+.test-table, .stress-table, .invocation-table {
+    margin: 1em;
+    width: calc(100% - 2em);
+}
+
+.test-table col, .stress-table col {
+    width: 8em;
+}
+
+.test-table .test-table-td, .stress-table .stress-table-td {
+    /*font-size: 125%;*/
+    padding-bottom: 1em;
+}
+
+.test-table-td-key {
+    width: 12em;
+}
+
+.checkboxGrid .checked {
+    background-color: #f2f7fc;
+}
+
+.backLink {
+    font-weight: bold;
+    margin: 1em;
+}
+
+.testSource {
+    background-color: #d3d3d3;
+}
+
+.interactionLog {
+    color: #1f2937;
+    overflow-x: auto;
+}
+.interactionLog pre {
+}
+.interactionLog .IN {
+    background: #eef4ff;
+}
+.interactionLog .OUT {
+    background-color: #d3d3d3;
+}
+.interactionLog .direction {
+    color: rgba(0, 0, 0, 0.3);
+    width: 16px;
+    font-weight: bold;
+    /*border-right: 1px solid gray;*/
+    /*margin-right: 5px;*/
+}
+.interactionLog .IN .direction {
+}
+.interactionLog .OUT .direction {
+}
+.interactionLog .noNewLine {
+    background-color: lightcoral;
+}
+.interactionLog .truncatedNote {
+    color: #6b7280;
+    font-style: italic;
+}
+
+.menu .active {
+    font-weight: bold;
+}
+
+.terms-of-use {
+    width: 400px;
+}
+
+.terms-of-use ol {
+    list-style-type: decimal;
+    list-style-position: inside;
+    padding: 0 1em;
+    margin: 0;
+}
+
+.terms-of-use ul {
+    list-style-type: circle;
+    list-style-position: inside;
+    padding: 0 0;
+    margin: 0;
+}
+
+.terms-of-use li {
+    padding: 0;
+    margin: 0;
+    font-size: 10px;
+}
+
+.muted {
+    color: #777;
+}
+
+.grid-notice {
+    color: #777;
+    font-size: 11px;
+    margin-left: 1em;
+}
+
+.popup {
+    position: fixed;
+    border: 6px solid #c3d9ff;
+    z-index: 10000;
+    background-color: #ffd;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    padding: 1em;
+}
+
+.popup .popup-close {
+    text-align: right;
+    position: absolute;
+    right: 1em;
+    top: 1em;
+}
+
+.popup .title {
+    font-size: 120%;
+    border-bottom: 1px solid rgb(128, 128, 128);
+    margin-bottom: 1.5em;
+    padding-bottom: 0.5em;
+}
+
+.popup .subtitle {
+    font-size: 100%;
+    position: relative;
+    bottom: 1.5em;
+    color: rgb(128, 128, 128);
+}
+
+.pagination a.active {
+    font-weight: bold;
+}
+
+.slowest-run {
+    background-color: #e5ecf9;
+}
+
+td.suspicious-run, td.violate-tag-run {
+    background-color: #ffe4b5;
+}
+
+.small {
+    font-size: 11px !important;
+}
+
+.metaCell .strong {
+    font-weight: bold;
+}
+
+pre.prettyprint {
+    padding: 0 !important;
+    border: none !important;
+}
+
+button.link {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    /*border is optional*/
+    text-decoration: underline;
+    cursor: pointer;
+    color: #0000cc;
+}
+
+.mirror {
+    transform: rotateX(180deg);
+}
+
+.pin-input {
+    text-security: disc;
+    -webkit-text-security: disc;
+    -moz-text-security: disc;
+}
+
+.tableCaptionPaginationHolder {
+    float: right;
+    font-size: 12px !important;
+    position: relative;
+    bottom: -3px;
+}
+
+.tableCaptionPaginationHolder * {
+    display: inline;
+}
+
+.tags .grey-box img {
+    cursor: pointer;
+}
+
+.editorHighlight {
+    position: absolute;
+    background: rgba(200, 100, 100, 0.5);
+    z-index: 20
+}
+
+/* hljs */
+pre code.hljs {
+    background: none !important;
+    padding: 0 1em 0 0 !important;
+}
+
+.hljs-ln {
+    width: 100%;
+}
+
+.hljs-ln-numbers {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    vertical-align: top;
+
+    padding-right: 0.75em !important;
+    text-align: right;
+    width: 2em;
+}
+
+.hljs-ln-n::after {
+    content: ".";
+}
+
+.hljs-ln-code {
+    padding-left: 0 !important;
+    background: #eff0f1 !important;
+    color: black;
+}
+
+.hljs-keyword {
+    color: #008 !important;
+    font-weight: bold !important;
+}
+
+.hljs-built_in {
+    color: #0033B3 !important;
+}
+
+.hljs-comment {
+    color: #067D17 !important;
+}
+
+.monospaced {
+    font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace, Menlo, "Courier New", monospace;
+}
+
+.hidden-or-absent-information {
+    color: #777;
+    font-size: 11px;
+}
+
+.file-copy-link {
+    margin-left: 0.5em;
+    font-size: 0.75rem;
+    color: #888;
+    padding: 3px;
+    cursor: pointer;
+    border: 1px solid rgb(185, 185, 185);
+    line-height: 0.8rem;
+    text-transform: none;
+}
+
+.file-copy-link:hover {
+    background-color: #def;
+}
+
+.critical-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: red;
+    opacity: 10%;
+    z-index: 1000000;
+    pointer-events: none;
+}
