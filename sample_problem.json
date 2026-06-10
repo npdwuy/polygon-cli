@@ -1,0 +1,48 @@
+{
+  "problems": [
+    {
+      "local_id": "aminusb",
+      "name": "A minus B",
+      "paths": {
+        "generator": "problems/aminusb/generator.cpp",
+        "statement": "problems/aminusb/statement.tex",
+        "solutions": [
+          {
+            "path": "problems/aminusb/main.cpp",
+            "tag": "MA"
+          }
+        ]
+      },
+      "settings": {
+        "time_limit": 1000,
+        "memory_limit": 256,
+        "checker": "std::lcmp.cpp",
+        "compiler": "cpp.gcc14-64-msys2-g++23",
+        "total_points": 100,
+        "points_policy": "EACH_TEST"
+      },
+      "test_config": {
+        "total_tests": 10,
+        "number_of_samples": 1,
+        "subtasks": [
+          {
+            "id": 1,
+            "proportion": 0.4,
+            "args": "1"
+          },
+          {
+            "id": 2,
+            "proportion": 0.6,
+            "args": "2"
+          }
+        ]
+      },
+      "pipeline_status": {},
+      "last_synced_hash": {},
+      "permissions": {
+        "codeforces": "Read"
+      },
+      "polygon_id": 549685
+    }
+  ]
+}

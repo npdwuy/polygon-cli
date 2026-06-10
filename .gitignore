@@ -4,14 +4,16 @@ downloads/
 temp_extract_*/
 scratch/
 problems/
+!problems/aminusb/
 contests/
 task.md
 tasks.md
 prompt.md
+automation_report.md
 package-lock.json
 *.zip
 problem.json
 contest.json
 __pycache__/
 AI_Resources/
-
+automation_report.md

@@ -258,8 +258,13 @@ sequenceDiagram
                 Pipeline->>Polygon: problem.packages (poll every 15s)
             end
             Note right of Pipeline: Stage 6: Output
-            Pipeline->>Polygon: problem.package (Download ZIP)
         end
+    end
+    
+    alt automate_mashup or grant_access is True
+        Note right of Pipeline: Stage 7: Browser Automation
+        Pipeline->>Browser: automate_mashup() or grant_polygon_access()
+        Note over Pipeline, Browser: Opens Selenium to grant access & create Mashup
     end
     
     Method-->>Pipeline: Pipeline Complete
@@ -315,12 +320,5 @@ sequenceDiagram
 
 ## 5. Execution Reporting
 
-Every execution of pipelines or browser automation writes a detailed report to `automation_report.md` in the workspace root.
-
-This report records:
-- **Timestamp:** Execution date/time.
-- **Pipeline Actions:** Which specific stages were executed (e.g., Statements synced, Build triggered).
-- **Automation Details:** 
-  - Login success.
-  - New Gym Mashup ID created (if applicable).
-  - List of problems successfully added to the mashup.
+Every execution of pipelines or browser automation writes detailed logs directly to the terminal stdout.
+The system does not generate a separate text report file to maintain a clean workspace.

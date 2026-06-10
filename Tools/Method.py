@@ -235,20 +235,20 @@ def execute_pipeline(local_id, init=False, resources=False, solutions=False, tes
     problem = get_problem(local_id)
     polygon_id = problem.get("polygon_id")
     
-    report_lines = [f"## Execution Report for {local_id} at {time.ctime()}"]
+    changes_made = False
     
     if init:
         if not polygon_id:
-            res = problem_create(problem["name"])
+            res = problem_create(local_id)
             polygon_id = res.get("id")
             _update_polygon_id(local_id, polygon_id)
             problem["polygon_id"] = polygon_id
-            report_lines.append(f"- [Init] Created problem on Polygon with ID {polygon_id}")
+            print(f"  - [Init] Created problem on Polygon with ID {polygon_id}")
             
         settings = problem["settings"]
         problem_update_info(polygon_id, timeLimit=settings["time_limit"], memoryLimit=settings["memory_limit"])
-        report_lines.append("- [Init] Updated problem info (timeLimit, memoryLimit)")
-        problem_commit_changes(polygon_id, message="Init problem metadata")
+        print("  - [Init] Updated problem info (timeLimit, memoryLimit)")
+        changes_made = True
         
     if not polygon_id:
         raise ValueError("Cannot proceed without polygon_id. Run init first.")
@@ -277,8 +277,8 @@ def execute_pipeline(local_id, init=False, resources=False, solutions=False, tes
             with open(stmt_path, "r", encoding="utf-8") as f:
                 problem_save_statement(polygon_id, lang="english", name=problem["name"], legend=f.read())
                 
-        report_lines.append("- [Resources] Uploaded statement, generator, and checker")
-        problem_commit_changes(polygon_id, message="Uploaded resources")
+        print("  - [Resources] Uploaded statement, generator, and checker")
+        changes_made = True
 
     if solutions:
         paths = problem["paths"]
@@ -287,8 +287,8 @@ def execute_pipeline(local_id, init=False, resources=False, solutions=False, tes
             if sol_path and os.path.exists(sol_path):
                 with open(sol_path, "r", encoding="utf-8") as f:
                     problem_save_solution(polygon_id, os.path.basename(sol_path), f.read(), tag=sol.get("tag"))
-        report_lines.append("- [Solutions] Uploaded solutions")
-        problem_commit_changes(polygon_id, message="Uploaded solutions")
+        print("  - [Solutions] Uploaded solutions")
+        changes_made = True
 
     if tests:
         script_lines = []
@@ -300,11 +300,11 @@ def execute_pipeline(local_id, init=False, resources=False, solutions=False, tes
         for subtask in test_config.get("subtasks", []):
             num_tests = int(subtask["proportion"] * test_config["total_tests"])
             for _ in range(num_tests):
-                args = f" {subtask['args']}" if subtask.get('args') else ""
-                script_lines.append(f"{gen_name} {current_test} {subtask['id']}{args} > {current_test}")
+                args = f"{subtask['args']} " if subtask.get('args') else ""
+                script_lines.append(f"{gen_name} {args}{current_test} > {current_test}")
                 current_test += 1
                 
-        script_content = "\\n".join(script_lines)
+        script_content = "\n".join(script_lines)
         
         script_path = os.path.join("problems", local_id, "script.txt")
         os.makedirs(os.path.dirname(script_path), exist_ok=True)
@@ -312,21 +312,24 @@ def execute_pipeline(local_id, init=False, resources=False, solutions=False, tes
             f.write(script_content)
             
         problem_save_script(polygon_id, "tests", script_content)
-        report_lines.append("- [Tests] Generated and uploaded script.txt")
-        problem_commit_changes(polygon_id, message="Uploaded test script")
+        print("  - [Tests] Generated and uploaded script.txt")
+        changes_made = True
+
+    if changes_made:
+        problem_commit_changes(polygon_id, message="Automated pipeline update")
+        print("  - [Commit] Committed all changes to Polygon")
 
     if build:
         try:
             problem_build_package(polygon_id, full=True, verify=True)
-            report_lines.append(f"- [Build] Triggered package build successfully")
+            print("  - [Build] Triggered package build successfully")
         except Exception as e:
             if 'already being built' not in str(e) and 'already non-failed' not in str(e):
                 raise e
             else:
-                report_lines.append(f"- [Build] Package build already triggered or completed")
+                print("  - [Build] Package build already triggered or completed")
 
-    with open("automation_report.md", "a", encoding="utf-8") as f:
-        f.write("\\n".join(report_lines) + "\\n\\n")
+    pass
 
 def download_package(local_id):
     problem = get_problem(local_id)
@@ -352,9 +355,7 @@ def download_package(local_id):
     with open(zip_path, 'wb') as f:
         f.write(zip_data)
         
-    with open("automation_report.md", "a", encoding="utf-8") as f:
-        f.write(f"## Download Report for {local_id} at {time.ctime()}\\n")
-        f.write(f"- [Download] Downloaded package to {zip_path}\\n\\n")
+    pass
 
 def create_contest(contest_name):
     path = CONTEST_JSON_PATH

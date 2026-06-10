@@ -55,7 +55,7 @@ def main():
         print(f"Starting pipeline for {len(targets)} problems: {', '.join(targets)}")
         
         for slug in targets:
-            print(f"\\n=================== Syncing: {slug} ===================")
+            print(f"\n=================== Syncing: {slug} ===================")
             try:
                 execute_pipeline(
                     slug,
@@ -67,7 +67,7 @@ def main():
                 )
                 print(f"[SUCCESS] Finished pipeline for {slug}")
             except Exception as e:
-                print(f"\\n[ERROR] Pipeline failed for {slug}: {e}")
+                print(f"\n[ERROR] Pipeline failed for {slug}: {e}")
                 traceback.print_exc()
                 
                 ans = input("Do you want to continue with the next problem? (y/n): ")
@@ -76,15 +76,42 @@ def main():
                     sys.exit(1)
                     
         if PIPELINE_FLAGS.get("download"):
-            print("\\n=================== Downloading Packages ===================")
+            print("\n=================== Downloading Packages ===================")
             for slug in targets:
-                print(f"\\n=================== Downloading: {slug} ===================")
+                print(f"\n=================== Downloading: {slug} ===================")
                 try:
                     download_package(slug)
                     print(f"[SUCCESS] Downloaded {slug}")
                 except Exception as e:
-                    print(f"\\n[ERROR] Download failed for {slug}: {e}")
+                    print(f"\n[ERROR] Download failed for {slug}: {e}")
                     traceback.print_exc()
+
+        run_mashup = PIPELINE_FLAGS.get("automate_mashup", False)
+        run_grant = PIPELINE_FLAGS.get("grant_access", False)
+        
+        if run_mashup or run_grant:
+            print("\n=================== Browser Automation ===================")
+            try:
+                from Tools.Browser import automate_mashup, grant_polygon_access, _get_driver
+                from polygon import MASHUP_GYM_ID, MASHUP_NAME, GRANT_USERS
+                
+                if run_mashup:
+                    print("Phase 3: Running Codeforces Mashup Automation (includes granting access)...")
+                    if not MASHUP_NAME and not MASHUP_GYM_ID:
+                        print("Skipping mashup creation (MASHUP_NAME and MASHUP_GYM_ID are both empty).")
+                    else:
+                        new_gym_id = automate_mashup(slugs=targets, gym_id=MASHUP_GYM_ID if MASHUP_GYM_ID else None, mashup_name=MASHUP_NAME)
+                        print("Mashup automation finished.")
+                        if new_gym_id and MASHUP_CONTEST_REF:
+                            _update_contest_gym_id(MASHUP_CONTEST_REF, new_gym_id)
+                elif run_grant:
+                    print("Phase 3: Granting Polygon Access...")
+                    driver = _get_driver()
+                    grant_polygon_access(driver, targets, GRANT_USERS)
+                    print("Grant access finished.")
+            except Exception as e:
+                print(f"\n[ERROR] Browser automation failed: {e}")
+                traceback.print_exc()
 
     elif COMMAND == "automate-mashup":
         targets = _get_targets()

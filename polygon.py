@@ -1,13 +1,10 @@
 # ==========================================
 # CẤU HÌNH CHẠY SCRIPT
 # ==========================================
-# COMMAND = "pipeline"
-COMMAND = "grant-access"
-# COMMAND = "automate-mashup"
-# COMMAND = "package-contest"
+COMMAND = "pipeline"
 
 # 0. Cấu hình BÀI TẬP MỤC TIÊU (Dùng chung cho pipeline và automate-mashup)
-TARGET_SLUGS = []  # Danh sách slug cụ thể. Để rỗng [] nếu dùng CONTEST_NAME_TO_SYNC
+TARGET_SLUGS = ["aminusb"]  # Danh sách slug cụ thể. Để rỗng [] nếu dùng CONTEST_NAME_TO_SYNC
 
 CONTEST_NAME_TO_SYNC = ""  # Nếu có tên, sẽ chạy các problem của contest đó trong contest.json
 
@@ -18,13 +15,15 @@ PIPELINE_FLAGS = {
     "solutions": True,
     "tests": True,
     "build": True,
-    "download": True
+    "download": True,
+    "grant_access": True,
+    "automate_mashup": True
 }
 
 # 2. Cấu hình cho lệnh 'automate-mashup'
-MASHUP_NAME = ""        # Tên Mashup muốn tạo mới trên Codeforces. Nếu rỗng, sẽ không tạo mới.
+MASHUP_NAME = "A Minus B"        # Tên Mashup muốn tạo mới trên Codeforces. Nếu rỗng, sẽ không tạo mới.
 MASHUP_GYM_ID = ""      # ID của Gym nếu đã có (Dùng khi MASHUP_NAME rỗng).
-MASHUP_CONTEST_REF = "" # Tên contest trong contest.json để lưu lại Gym ID sau khi tạo (Tùy chọn)
+MASHUP_CONTEST_REF = "aminusb" # Tên contest trong contest.json để lưu lại Gym ID sau khi tạo (Tùy chọn)
 
 # 3. Cấu hình cho lệnh 'package-contest'
 PACKAGE_CONTEST_NAME = ""  # Nếu rỗng thì không trigger việc đóng gói contest
@@ -38,9 +37,8 @@ GRANT_USERS = {
 # ==========================================
 # HẰNG SỐ ĐƯỜNG DẪN HỆ THỐNG
 # ==========================================
-PROBLEM_JSON_PATH = "problem.json"
+PROBLEM_JSON_PATH = "sample_problem.json"
 CONTEST_JSON_PATH = "contest.json"
-AUTOMATION_REPORT_PATH = "automation_report.md"
 CONTESTS_OUTPUT_DIR = "contests"
 
 

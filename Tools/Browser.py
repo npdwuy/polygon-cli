@@ -1,4 +1,4 @@
-from polygon import PROBLEM_JSON_PATH, AUTOMATION_REPORT_PATH
+from polygon import PROBLEM_JSON_PATH
 import os
 import sys
 import time
@@ -126,6 +126,7 @@ def grant_polygon_access(driver, slugs, grant_users_dict):
     if not grant_users_dict:
         return
         
+    print("  - Checking Polygon login status...")
     login_polygon(driver)
     
     polygon_user = os.environ.get("POLYGON_USERNAME", "")
@@ -163,6 +164,7 @@ def grant_polygon_access(driver, slugs, grant_users_dict):
             p["permissions"] = perms
             continue
             
+        print(f"\n  - Processing access for {p['local_id']}...")
         for attempt in range(3):
             try:
                 row = WebDriverWait(driver, 10).until(
@@ -180,6 +182,7 @@ def grant_polygon_access(driver, slugs, grant_users_dict):
                 time.sleep(1)
                 
                 for user, right in users_to_grant:
+                    print(f"    -> Granting {right} access to {user}...")
                     try:
                         driver.find_element(By.ID, "add-user").click()
                         time.sleep(1)
@@ -222,6 +225,7 @@ def grant_polygon_access(driver, slugs, grant_users_dict):
 
 
 def get_polygon_urls(driver, slugs):
+    print("  - Checking Polygon login status...")
     login_polygon(driver)
     
     with open(PROBLEM_JSON_PATH, "r", encoding="utf-8") as f:
@@ -238,6 +242,7 @@ def get_polygon_urls(driver, slugs):
         if not polygon_id:
             continue
             
+        print(f"\n  - Extracting Gym URL for {p['local_id']}...")
         for attempt in range(3):
             try:
                 row = WebDriverWait(driver, 10).until(
@@ -257,10 +262,14 @@ def get_polygon_urls(driver, slugs):
                 src = driver.page_source
                 match = re.search(r'(https://polygon\.codeforces\.com/p[\w\-]+/[\w\-]+/[\w\-]+)', src)
                 if match:
-                    urls.append(match.group(1))
+                    extracted_url = match.group(1)
+                    urls.append(extracted_url)
+                    print(f"    -> Scraped URL: {extracted_url}")
                 else:
                     url_el = driver.find_element(By.CLASS_NAME, "problemUrl")
-                    urls.append(url_el.get_attribute("textContent").strip().split()[0])
+                    extracted_url = url_el.get_attribute("textContent").strip().split()[0]
+                    urls.append(extracted_url)
+                    print(f"    -> Scraped URL: {extracted_url}")
                     
                 driver.get("https://polygon.codeforces.com/problems")
                 time.sleep(0.5)
@@ -275,13 +284,6 @@ def get_polygon_urls(driver, slugs):
                     print(f"Error processing URL for problem {p['local_id']} after 3 attempts: {e}")
                     driver.get("https://polygon.codeforces.com/problems")
                     time.sleep(0.5)
-            
-    with open(AUTOMATION_REPORT_PATH, "a", encoding="utf-8") as f:
-        f.write(f"## Polygon Automation Report at {time.ctime()}\n")
-        f.write(f"Extracted {len(urls)} Gym URLs for slugs: {', '.join(slugs)}\n")
-        for u in urls:
-            f.write(f"- {u}\n")
-        f.write("\n")
         
     return urls
 
@@ -308,7 +310,7 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None):
         from polygon import GRANT_USERS
         grant_polygon_access(driver, slugs, GRANT_USERS)
         
-        print("Extracting sharing URLs...")
+        print("\n  - Extracting sharing URLs...")
         urls = get_polygon_urls(driver, slugs)
         
         if not urls:
@@ -319,6 +321,7 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None):
         login_codeforces(driver)
         
         if not gym_id and mashup_name:
+            print(f"\n  - Creating new Codeforces Mashup: {mashup_name}...")
             driver.get("https://codeforces.com/mashup/new")
             try:
                 name_input = WebDriverWait(driver, 10).until(
@@ -354,6 +357,7 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None):
         time.sleep(3)
         
         for url in urls:
+            print(f"  - Adding URL to Mashup: {url}")
             for attempt in range(3):
                 try:
                     input_el = WebDriverWait(driver, 10).until(
@@ -389,11 +393,6 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None):
             time.sleep(5)
         except Exception as e:
             print(f"Failed to save mashup: {e}")
-            
-        with open(AUTOMATION_REPORT_PATH, "a", encoding="utf-8") as f:
-            f.write(f"## Codeforces Automation Report at {time.ctime()}\n")
-            f.write(f"Added problems to Mashup Gym ID: {gym_id}\n")
-            f.write(f"Slugs: {', '.join(slugs)}\n\n")
             
         return gym_id
     finally:
