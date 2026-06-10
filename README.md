@@ -22,7 +22,7 @@ Công cụ này giúp bạn tự động hóa hoàn toàn quy trình ra đề th
 
 ## 2. Cách sử dụng (Luồng Cấu Hình)
 
-Khác với các công cụ cũ phải gõ dòng lệnh dài dòng, DWUY Polygon Tool sử dụng **cấu hình trực tiếp**. Bạn chỉ cần mở file `polygon.py` (file duy nhất bạn cần quan tâm), chỉnh sửa các biến cấu hình ngay ở phần đầu file, lưu lại và chạy lệnh:
+DWUY Polygon Tool sử dụng **cấu hình trực tiếp**. Bạn chỉ cần mở file `polygon.py` (file duy nhất bạn cần quan tâm), chỉnh sửa các biến cấu hình ngay ở phần đầu file, lưu lại và chạy lệnh:
 
 ```bash
 python polygon.py
