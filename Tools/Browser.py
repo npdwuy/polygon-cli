@@ -34,6 +34,7 @@ def _get_driver():
     
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.set_page_load_timeout(10)
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
     })
@@ -121,14 +122,112 @@ def login_codeforces(driver):
     except Exception as e:
         print(f"Codeforces Login Form not found or error: {e}")
 
-def grant_polygon_access_and_get_urls(driver, slugs, grant_access=True):
+def grant_polygon_access(driver, slugs, grant_users_dict):
+    if not grant_users_dict:
+        return
+        
+    login_polygon(driver)
+    
+    polygon_user = os.environ.get("POLYGON_USERNAME", "")
+    
+    with open(PROBLEM_JSON_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        
+    problems = [p for p in data.get("problems", []) if p["local_id"] in slugs]
+    
+    driver.get("https://polygon.codeforces.com/problems")
+    time.sleep(3)
+    
+    rights_map = {"Read": 0, "Write": 1}
+    
+    for p in problems:
+        polygon_id = p.get("polygon_id")
+        if not polygon_id:
+            continue
+            
+        perms = p.get("permissions", {})
+        if polygon_user and polygon_user not in perms:
+            perms[polygon_user] = "Write"
+            p["permissions"] = perms
+            
+        users_to_grant = []
+        for user, target_right in grant_users_dict.items():
+            target_val = rights_map.get(target_right, 0)
+            current_right = perms.get(user, None)
+            current_val = rights_map.get(current_right, -1)
+            
+            if target_val > current_val:
+                users_to_grant.append((user, target_right))
+                
+        if not users_to_grant:
+            p["permissions"] = perms
+            continue
+            
+        for attempt in range(3):
+            try:
+                row = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, f"//tr[@problemid='{polygon_id}']"))
+                )
+                try:
+                    link = row.find_element(By.CSS_SELECTOR, "a.START_EDIT_SESSION")
+                except:
+                    link = row.find_element(By.CSS_SELECTOR, "a.CONTINUE_EDIT_SESSION")
+                    
+                driver.get(link.get_attribute("href"))
+                time.sleep(3)
+                
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Manage access"))).click()
+                time.sleep(1)
+                
+                for user, right in users_to_grant:
+                    try:
+                        driver.find_element(By.ID, "add-user").click()
+                        time.sleep(1)
+                        
+                        user_input = driver.find_element(By.NAME, "users_added")
+                        user_input.send_keys(Keys.CONTROL, 'a')
+                        user_input.send_keys(Keys.BACKSPACE)
+                        user_input.send_keys(user)
+                        
+                        try:
+                            from selenium.webdriver.support.ui import Select
+                            right_select = Select(driver.find_element(By.NAME, "type"))
+                            right_select.select_by_visible_text(right)
+                        except:
+                            pass
+                            
+                        user_input.send_keys(Keys.ENTER)
+                        time.sleep(1)
+                        perms[user] = right
+                    except Exception as ex:
+                        print(f"Failed to grant {right} to {user} on {p['local_id']}: {ex}")
+                        
+                p["permissions"] = perms
+                driver.get("https://polygon.codeforces.com/problems")
+                time.sleep(0.5)
+                break
+                
+            except Exception as e:
+                if attempt < 2:
+                    print(f"Lag detected ({e}). Reloading problems page, waiting 10s...")
+                    driver.get("https://polygon.codeforces.com/problems")
+                    time.sleep(10)
+                else:
+                    print(f"Error processing access for problem {p['local_id']} after 3 attempts: {e}")
+                    driver.get("https://polygon.codeforces.com/problems")
+                    time.sleep(0.5)
+            
+    with open(PROBLEM_JSON_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def get_polygon_urls(driver, slugs):
     login_polygon(driver)
     
     with open(PROBLEM_JSON_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
         
     problems = [p for p in data.get("problems", []) if p["local_id"] in slugs]
-        
     urls = []
     
     driver.get("https://polygon.codeforces.com/problems")
@@ -139,59 +238,43 @@ def grant_polygon_access_and_get_urls(driver, slugs, grant_access=True):
         if not polygon_id:
             continue
             
-        try:
-            # 1. Start or Continue session
-            row = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, f"//tr[@problemid='{polygon_id}']"))
-            )
+        for attempt in range(3):
             try:
-                link = row.find_element(By.CSS_SELECTOR, "a.START_EDIT_SESSION")
-            except:
-                link = row.find_element(By.CSS_SELECTOR, "a.CONTINUE_EDIT_SESSION")
+                row = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, f"//tr[@problemid='{polygon_id}']"))
+                )
+                try:
+                    link = row.find_element(By.CSS_SELECTOR, "a.START_EDIT_SESSION")
+                except:
+                    link = row.find_element(By.CSS_SELECTOR, "a.CONTINUE_EDIT_SESSION")
+                    
+                driver.get(link.get_attribute("href"))
+                time.sleep(3)
                 
-            driver.get(link.get_attribute("href"))
-            time.sleep(3)
-            
-            # 1. Get General Info to scrape URL FIRST
-            WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "General info"))).click()
-            time.sleep(1)
-            
-            src = driver.page_source
-            match = re.search(r'(https://polygon\.codeforces\.com/p[\w\-]+/[\w\-]+/[\w\-]+)', src)
-            if match:
-                urls.append(match.group(1))
-            else:
-                url_el = driver.find_element(By.CLASS_NAME, "problemUrl")
-                urls.append(url_el.get_attribute("textContent").strip().split()[0])
-                
-            # 2. Grant access
-            if grant_access:
-                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Manage access"))).click()
+                WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "General info"))).click()
                 time.sleep(1)
                 
-                try:
-                    # Click the "Add Users" link to show the form
-                    driver.find_element(By.ID, "add-user").click()
-                    time.sleep(1)
+                src = driver.page_source
+                match = re.search(r'(https://polygon\.codeforces\.com/p[\w\-]+/[\w\-]+/[\w\-]+)', src)
+                if match:
+                    urls.append(match.group(1))
+                else:
+                    url_el = driver.find_element(By.CLASS_NAME, "problemUrl")
+                    urls.append(url_el.get_attribute("textContent").strip().split()[0])
                     
-                    # The input field has name "users_added"
-                    user_input = driver.find_element(By.NAME, "users_added")
-                    user_input.send_keys(Keys.CONTROL, 'a')
-                    user_input.send_keys(Keys.BACKSPACE)
-                    user_input.send_keys("codeforces")
-                    user_input.send_keys(Keys.ENTER)
-                    time.sleep(1)
-                except Exception:
-                    pass # Maybe already granted or error
-
-            # Return to problems page for next problem
-            driver.get("https://polygon.codeforces.com/problems")
-            time.sleep(0.5)
-            
-        except Exception as e:
-            print(f"Error processing problem {p['local_id']}: {e}")
-            driver.get("https://polygon.codeforces.com/problems")
-            time.sleep(0.5)
+                driver.get("https://polygon.codeforces.com/problems")
+                time.sleep(0.5)
+                break
+                
+            except Exception as e:
+                if attempt < 2:
+                    print(f"Lag detected ({e}). Reloading problems page, waiting 10s...")
+                    driver.get("https://polygon.codeforces.com/problems")
+                    time.sleep(10)
+                else:
+                    print(f"Error processing URL for problem {p['local_id']} after 3 attempts: {e}")
+                    driver.get("https://polygon.codeforces.com/problems")
+                    time.sleep(0.5)
             
     with open(AUTOMATION_REPORT_PATH, "a", encoding="utf-8") as f:
         f.write(f"## Polygon Automation Report at {time.ctime()}\n")
@@ -202,15 +285,31 @@ def grant_polygon_access_and_get_urls(driver, slugs, grant_access=True):
         
     return urls
 
-def automate_mashup(slugs, gym_id=None, mashup_name=None, grant_access=True):
+def grant_access_only(slugs, grant_users_dict):
+    if not slugs:
+        print("No slugs provided for granting access.")
+        return
+    driver = _get_driver()
+    try:
+        print("Granting access on Polygon...")
+        grant_polygon_access(driver, slugs, grant_users_dict)
+    finally:
+        driver.quit()
+
+def automate_mashup(slugs, gym_id=None, mashup_name=None):
     if not slugs:
         print("No slugs provided for mashup automation.")
         return None
         
     driver = _get_driver()
     try:
-        print("Granting access on Polygon and extracting sharing URLs...")
-        urls = grant_polygon_access_and_get_urls(driver, slugs, grant_access=grant_access)
+        # Default grant access for mashup
+        print("Granting default access on Polygon...")
+        from polygon import GRANT_USERS
+        grant_polygon_access(driver, slugs, GRANT_USERS)
+        
+        print("Extracting sharing URLs...")
+        urls = get_polygon_urls(driver, slugs)
         
         if not urls:
             print("No valid Polygon URLs found/extracted. Aborting Mashup creation.")
@@ -255,24 +354,31 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None, grant_access=True):
         time.sleep(3)
         
         for url in urls:
-            try:
-                input_el = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.NAME, "problemQuery"))
-                )
-                input_el.send_keys(Keys.CONTROL, 'a')
-                input_el.send_keys(Keys.BACKSPACE)
-                input_el.send_keys(url)
-                time.sleep(0.5)
-                
-                add_link = driver.find_element(By.CLASS_NAME, "_MashupContestEditFrame_addProblemLink")
-                add_link.click()
-                
-                WebDriverWait(driver, 30).until(
-                    lambda d: d.find_element(By.NAME, "problemQuery").is_enabled()
-                )
-                time.sleep(1)
-            except Exception as e:
-                print(f"Failed to add URL {url}: {e}")
+            for attempt in range(3):
+                try:
+                    input_el = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.NAME, "problemQuery"))
+                    )
+                    input_el.send_keys(Keys.CONTROL, 'a')
+                    input_el.send_keys(Keys.BACKSPACE)
+                    input_el.send_keys(url)
+                    time.sleep(0.5)
+                    
+                    add_link = driver.find_element(By.CLASS_NAME, "_MashupContestEditFrame_addProblemLink")
+                    add_link.click()
+                    
+                    WebDriverWait(driver, 30).until(
+                        lambda d: d.find_element(By.NAME, "problemQuery").is_enabled()
+                    )
+                    time.sleep(1)
+                    break
+                except Exception as e:
+                    if attempt < 2:
+                        print(f"Lag adding {url}. Reloading mashup edit page, waiting 10s...")
+                        driver.refresh()
+                        time.sleep(10)
+                    else:
+                        print(f"Failed to add URL {url} after 3 attempts: {e}")
                 
         # Save mashup
         try:

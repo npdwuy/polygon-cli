@@ -4,7 +4,7 @@ import traceback
 import os
 
 from Tools.Method import execute_pipeline, get_problems, create_contest, download_package
-from Tools.Browser import automate_mashup
+from Tools.Browser import automate_mashup, grant_access_only
 
 from polygon import *
 
@@ -94,7 +94,7 @@ def main():
             
         print("Starting Codeforces Mashup Automation...")
         try:
-            new_gym_id = automate_mashup(slugs=targets, gym_id=MASHUP_GYM_ID if MASHUP_GYM_ID else None, mashup_name=MASHUP_NAME, grant_access=GRANT_CODEFORCES_ACCESS)
+            new_gym_id = automate_mashup(slugs=targets, gym_id=MASHUP_GYM_ID if MASHUP_GYM_ID else None, mashup_name=MASHUP_NAME)
             print("Mashup automation finished.")
             
             if new_gym_id and MASHUP_CONTEST_REF:
@@ -114,6 +114,16 @@ def main():
         except Exception as e:
             print(f"Failed to package contest: {e}")
             
+    elif COMMAND == "grant-access":
+        targets = _get_targets()
+        print(f"Starting grant access for {len(targets)} problems...")
+        try:
+            grant_access_only(targets, GRANT_USERS)
+            print("Grant access finished.")
+        except Exception as e:
+            print(f"Failed to grant access: {e}")
+            traceback.print_exc()
+
     else:
         print(f"Unknown command: {COMMAND}")
 
