@@ -164,9 +164,10 @@ Polygon-tool/
 ├── .env                       # Secrets (Managed manually by user)
 ├── problem.json               # Problem Registry
 ├── contest.json               # Contest Registry
-├── polygon.py                 # Core CLI entry script
+├── polygon.py                 # Core configuration and CLI entry script
 │
 ├── Tools/                     # Modules
+│   ├── Pipeline.py            # CLI router and orchestrator
 │   ├── Method.py              # File system, API wrappers, registry validations
 │   └── Browser.py             # Browser automation wrapper (Selenium operations)
 │
@@ -206,14 +207,16 @@ The user will trigger the pipeline by configuring the target problem slugs and b
 sequenceDiagram
     autonumber
     actor User
-    participant CLI as polygon.py
-    participant Pipeline as Method.py
+    participant Entry as polygon.py
+    participant Pipeline as Tools/Pipeline.py
+    participant Method as Tools/Method.py
     participant Polygon as Polygon API
 
-    User->>CLI: Cấu hình biến trong file & chạy: python polygon.py
+    User->>Entry: Cấu hình biến trong file & chạy: python polygon.py
+    Entry->>Pipeline: Gọi hàm main()
     
     loop For each problem
-        CLI->>Pipeline: execute_pipeline(slug, init=True, build=True...)
+        Pipeline->>Method: execute_pipeline(slug, init=True, build=True...)
         Pipeline->>Pipeline: Load & Validate problem.json
         
         alt init is True
@@ -250,7 +253,7 @@ sequenceDiagram
     
     alt download is True
         loop For each problem
-            CLI->>Pipeline: download_package(slug)
+            Pipeline->>Method: download_package(slug)
             loop Wait for Build
                 Pipeline->>Polygon: problem.packages (poll every 15s)
             end
@@ -259,6 +262,7 @@ sequenceDiagram
         end
     end
     
+    Method-->>Pipeline: Pipeline Complete
     Pipeline-->>User: Pipeline Complete
 ```
 
@@ -278,11 +282,14 @@ sequenceDiagram
     Browser->>Polygon: Navigate to login page
     Browser->>Browser: Clear username/password inputs
     Browser->>Polygon: Enter env credentials & Submit
+    
     loop Each Problem in TARGET_SLUGS
-        Browser->>Polygon: Access /access page
-        Note over Browser, Polygon: Grant 'codeforces' user Read permission if absent
         Browser->>Polygon: Access /generalInfo page
         Browser->>Browser: Scrape sharing Gym URL
+        alt grant_access is True
+            Browser->>Polygon: Access 'Manage access' page
+            Note over Browser, Polygon: Grant 'codeforces' user Read permission
+        end
     end
     
     Browser->>CF: Navigate to login page
@@ -296,12 +303,12 @@ sequenceDiagram
     end
     
     Browser->>CF: Redirect to /gym/{gym_id}/problems/new
-    loop Each Sharing URL from gym_urls.txt
+    loop Each Scraped Sharing URL
         Browser->>CF: Input URL & click Add
         Note over Browser, CF: Wait for AJAX completion
     end
     Browser->>CF: Click Save mashup button
-    Browser-->>CLI: Import complete & Update contest.json with gym_id
+    Browser-->>CLI: Automation complete & Update contest.json with gym_id
 ```
 
 ---

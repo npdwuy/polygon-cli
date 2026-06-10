@@ -22,7 +22,7 @@ Công cụ này giúp bạn tự động hóa hoàn toàn quy trình ra đề th
 
 ## 2. Cách sử dụng (Luồng Cấu Hình)
 
-Khác với các công cụ cũ phải gõ dòng lệnh dài dòng, DWUY Polygon Tool sử dụng **cấu hình trực tiếp**. Bạn chỉ cần mở file `polygon.py`, chỉnh sửa các biến cấu hình ngay ở phần đầu file, lưu lại và chạy lệnh:
+Khác với các công cụ cũ phải gõ dòng lệnh dài dòng, DWUY Polygon Tool sử dụng **cấu hình trực tiếp**. Bạn chỉ cần mở file `polygon.py` (file duy nhất bạn cần quan tâm), chỉnh sửa các biến cấu hình ngay ở phần đầu file, lưu lại và chạy lệnh:
 
 ```bash
 python polygon.py
@@ -47,12 +47,13 @@ Gửi và đồng bộ mã nguồn, cấu hình từ máy tính của bạn lên
 #### B. `COMMAND = "automate-mashup"`
 *(Yêu cầu bài tập đã chạy qua pipeline và đã có trên Polygon)*
 Lệnh này kết hợp cả hai bước cấp quyền và tạo Mashup trong cùng một phiên duyệt web (Selenium):
-1. **Trên Polygon**: Tự động cấp quyền **Read** cho tài khoản `codeforces` và trích xuất **link chia sẻ Gym** bí mật.
-2. **Trên Codeforces**: Tự động tạo Mashup và nhúng các bài tập trên vào.
+1. **Trên Polygon**: Dựa vào tuỳ chọn `GRANT_CODEFORCES_ACCESS`, tool sẽ tự động vào trang thông tin bài tập, cào lấy **link chia sẻ Gym bí mật**, sau đó vào phần cài đặt quyền để cấp quyền **Read** cho tài khoản `codeforces`.
+2. **Trên Codeforces**: Tự động tạo Mashup và nhúng các bài tập trên vào thông qua link vừa cào được.
 - **`TARGET_SLUGS`** / **`CONTEST_NAME_TO_SYNC`**: Vẫn giữ nguyên cấu hình mục tiêu như lệnh pipeline để tool biết lấy các bài nào.
 - **`MASHUP_NAME`**: Nếu có tên, tool sẽ tạo mới một Gym Mashup mang tên này.
 - **`MASHUP_GYM_ID`**: Nếu bạn đã tạo Gym từ trước, hãy điền ID của Gym đó vào đây (khi dùng cái này thì để trống MASHUP_NAME).
 - **`MASHUP_CONTEST_REF`**: (Tuỳ chọn) Tên contest local trong `contest.json`. Nếu bạn điền, sau khi Codeforces tạo xong Mashup, ID của nó sẽ được tự động lưu về `contest.json` cho bạn.
+- **`GRANT_CODEFORCES_ACCESS`**: Đặt thành `True` để bot thay bạn thao tác cấp quyền Read cho tài khoản `codeforces` trên tất cả các bài tập mục tiêu.
 
 #### C. `COMMAND = "package-contest"`
 Sau khi đã `download` các bài tập thành công về máy, lệnh này giúp bạn lấy file ZIP của các bài gộp chung lại vào một file ZIP tổng của Contest (Rất tiện khi muốn gửi đề cho nền tảng khác chấm).
