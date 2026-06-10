@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/Vibe/Polygon-tool/problems/kfusion",
-      "program": "d:/Vibe/Polygon-tool/problems/kfusion/build/Debug/outDebug",
+      "cwd": "d:/Vibe/Polygon-tool/problems/dem-so-nguyen-to",
+      "program": "d:/Vibe/Polygon-tool/problems/dem-so-nguyen-to/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
