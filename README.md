@@ -30,7 +30,7 @@ python polygon.py
 
 ### Giải thích các `COMMAND`
 
-Tại dòng `COMMAND = "..."`, bạn có thể chọn 1 trong 4 tính năng sau:
+Tại dòng `COMMAND = "..."`, bạn có thể chọn 1 trong 3 tính năng sau:
 
 #### A. `COMMAND = "pipeline"`
 Gửi và đồng bộ mã nguồn, cấu hình từ máy tính của bạn lên máy chủ Polygon.
