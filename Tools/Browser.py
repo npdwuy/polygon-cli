@@ -1,3 +1,4 @@
+from polygon import PROBLEM_JSON_PATH, AUTOMATION_REPORT_PATH
 import os
 import sys
 import time
@@ -123,7 +124,7 @@ def login_codeforces(driver):
 def grant_polygon_access_and_get_urls(driver, slugs, grant_access=True):
     login_polygon(driver)
     
-    with open("problem.json", "r", encoding="utf-8") as f:
+    with open(PROBLEM_JSON_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
         
     problems = [p for p in data.get("problems", []) if p["local_id"] in slugs]
@@ -192,7 +193,7 @@ def grant_polygon_access_and_get_urls(driver, slugs, grant_access=True):
             driver.get("https://polygon.codeforces.com/problems")
             time.sleep(0.5)
             
-    with open("automation_report.md", "a", encoding="utf-8") as f:
+    with open(AUTOMATION_REPORT_PATH, "a", encoding="utf-8") as f:
         f.write(f"## Polygon Automation Report at {time.ctime()}\n")
         f.write(f"Extracted {len(urls)} Gym URLs for slugs: {', '.join(slugs)}\n")
         for u in urls:
@@ -283,7 +284,7 @@ def automate_mashup(slugs, gym_id=None, mashup_name=None, grant_access=True):
         except Exception as e:
             print(f"Failed to save mashup: {e}")
             
-        with open("automation_report.md", "a", encoding="utf-8") as f:
+        with open(AUTOMATION_REPORT_PATH, "a", encoding="utf-8") as f:
             f.write(f"## Codeforces Automation Report at {time.ctime()}\n")
             f.write(f"Added problems to Mashup Gym ID: {gym_id}\n")
             f.write(f"Slugs: {', '.join(slugs)}\n\n")

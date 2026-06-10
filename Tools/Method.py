@@ -1,3 +1,4 @@
+from polygon import PROBLEM_JSON_PATH, CONTEST_JSON_PATH, CONTESTS_OUTPUT_DIR
 import os
 import zipfile
 import shutil
@@ -152,7 +153,7 @@ import zipfile
 import shutil
 
 def get_problems():
-    path = "problem.json"
+    path = PROBLEM_JSON_PATH
     if not os.path.exists(path):
         raise FileNotFoundError(f"{path} not found")
     with open(path, "r", encoding="utf-8") as f:
@@ -173,7 +174,7 @@ def get_problem(local_id):
     raise ValueError(f"Problem {local_id} not found in problem.json")
 
 def add_problem(local_id, name):
-    path = "problem.json"
+    path = PROBLEM_JSON_PATH
     data = {"problems": []}
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
@@ -220,7 +221,7 @@ def add_problem(local_id, name):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def _update_polygon_id(local_id, polygon_id):
-    path = "problem.json"
+    path = PROBLEM_JSON_PATH
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
     for p in data.get("problems", []):
@@ -356,7 +357,7 @@ def download_package(local_id):
         f.write(f"- [Download] Downloaded package to {zip_path}\\n\\n")
 
 def create_contest(contest_name):
-    path = "contest.json"
+    path = CONTEST_JSON_PATH
     if not os.path.exists(path):
         raise FileNotFoundError("contest.json not found")
         
