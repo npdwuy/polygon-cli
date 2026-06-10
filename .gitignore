@@ -3,7 +3,7 @@ node_modules/
 downloads/
 temp_extract_*/
 scratch/
-problems/
+problems/*
 !problems/aminusb/
 contests/
 task.md
